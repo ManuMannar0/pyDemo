@@ -1,107 +1,204 @@
-from flask import Flask, request, redirect, render_template
-from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
-from peewee import Model, CharField, SqliteDatabase
+# -*- coding: utf-8 -*-
+
 import requests
-from datetime import datetime, timedelta
+import threading
+import time
+import json
+from flask import Flask, request, redirect, render_template, session, url_for
+from flask_login import LoginManager, current_user, login_user, logout_user, login_required, UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+from peewee import Model, CharField, SqliteDatabase, BooleanField
+from datetime import datetime, timezone
+from flask_socketio import SocketIO
+from authlib.integrations.flask_client import OAuth
+from dotenv import load_dotenv
+import os
 
-secret_key = 'asf4fAG4gadgmu875fdDGG'
-weather_key = 'ef3f883ea14e274c1bf43027321af0fc'
+load_dotenv()
 
-# Configurazione dell'app Flask e del database
 app = Flask(__name__)
-app.config['SECRET_KEY'] = weather_key
-db = SqliteDatabase('myapp.db')
-
-# Configurazione di Flask-Login
+app.config['SECRET_KEY'] = os.getenv('ISS_PY_KEY')
+db = SqliteDatabase('isspy.db')
+socketio = SocketIO(app)
+oauth = OAuth(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# Modello utente con Peewee
-class User(Model, UserMixin):
-    username = CharField(unique=True)
-    password_hash = CharField()
+google = oauth.register(
+    name='google',
+    client_id=os.getenv('GOOGLE_CLIENT_ID'),
+    client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs={'scope': 'openid email profile'}
+)
 
+class User(Model, UserMixin):
+    username = CharField(unique=True, null=True)
+    password_hash = CharField(null=True)
+    email = CharField(unique=True, null=True)
+    is_oauth = BooleanField(default=False)
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
-
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-
     class Meta:
         database = db
 
-# Funzione di caricamento utente per Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
     return User.get_or_none(User.id == int(user_id))
 
-# Route per la homepage
+def iss_tracker():
+    while True:
+        position = get_iss_position()
+        socketio.emit('update_position', {'latitude': position['latitude'], 'longitude': position['longitude']})
+        print(position['latitude'], position['longitude'])
+        time.sleep(10)  
+
+def get_iss_position():
+    url = "https://api.wheretheiss.at/v1/satellites/25544"
+    payload={}
+    headers = {}
+    response = requests.request("GET", url, headers=headers, data=payload)
+    location = json.loads(response.text)
+    return(location)
+
+def find_or_create_google_user(userinfo):
+    email = userinfo['email']
+    user = User.get_or_none(User.email == email)
+    if not user:
+        user = User.create(email=email, is_oauth=True) 
+    return user
+
+@app.errorhandler(404)
+def page_not_found(erro):
+    return redirect(url_for('root'))
+
 @app.route('/')
 @login_required
 def root():
-    lat, lon = 45.7372, 7.3206
-    timestamp = int((datetime.now() - timedelta(days=365 * 10)).timestamp())
-    api_key = 'ef3f883ea14e274c1bf43027321af0fc'
-    url = f"https://history.openweathermap.org/data/3.0/history/timemachine?lat={lat}&lon={lon}&dt={timestamp}&appid={api_key}"
-    response = requests.get(url)
-    weather_data = response.json()
-    print(weather_data)
+    return render_template('homepage.html')
 
-    return render_template('homepage.html', weather_data=weather_data)
+@app.route('/open_street_map', methods=['POST'])
+@login_required
+def open_street_map():
+    city_name = request.form['city_name']
+    response = requests.get(f"https://nominatim.openstreetmap.org/search?city={city_name}&format=json")
+    cities = response.json()
+    if len(cities):
+        return render_template('homepage.html', cities=cities)
+    else:
+        return render_template('homepage.html', messages=response)
 
-# Route per il login
+@app.route('/iss', methods=['POST'])
+@login_required
+def iss():
+    lat = request.form['lat']
+    lon = request.form['lon']
+    atLeastSec = 30
+    forNextDays = 7
+    alt = 0
+    satellite = 25544 #ISS
+    response = requests.get(f"https://api.n2yo.com/rest/v1/satellite/visualpasses/{satellite}/{lat}/{lon}/{alt}/{forNextDays}/{atLeastSec}/&apiKey={os.getenv('N2YO_KEY')}")
+    data = response.json()
+    def format_timestamp(unix_timestamp):
+        return datetime.fromtimestamp(unix_timestamp, timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+    descriptions = []
+    for pass_info in data["passes"]:
+        start_time = format_timestamp(pass_info["startUTC"])
+        start_direction = pass_info["startAzCompass"]
+        max_time = format_timestamp(pass_info["maxUTC"])
+        max_direction = pass_info["maxAzCompass"]
+        description = (
+            f"Per osservare l'ISS, rivolgiti verso {start_direction} alle {start_time}. "
+            f"Il punto di massima elevazione sarà verso {max_direction} alle {max_time}."
+        )
+        descriptions.append(description)
+    return render_template('homepage.html', messages=descriptions)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
         user = User.get_or_none(User.username == username)
-        if user and user.check_password(password):
+        if user and user.password_hash and user.check_password(password):
+            login_user(user)
+            return redirect('/')
+        elif user and user.is_oauth:
             login_user(user)
             return redirect('/')
         else:
             return 'Invalid username or password'
-
     return render_template('login.html')
 
-# Route per il logout
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect('/')
 
-# Route per visualizzare gli utenti
+@app.route('/login/google', methods=['POST'])
+def logingoogle():
+    redirect_uri = url_for('authorized', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@app.route('/login/google/authorized')
+def authorized():
+    google.authorize_access_token()
+    token = google.token
+    session['google_token'] = token 
+    userinfo = google.get('https://www.googleapis.com/oauth2/v3/userinfo').json()
+
+    # Stampare le informazioni recuperate
+    print("Userinfo:", userinfo)
+    print("OpenID:", userinfo.get('sub'))
+    print("Email:", userinfo.get('email'))
+    print("Profile Name:", userinfo.get('name'))
+
+    user = find_or_create_google_user(userinfo)
+    login_user(user)
+    return redirect(url_for('root'))
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    user_id = current_user.id if not current_user.is_anonymous else None
+    is_google_user = current_user.is_oauth if not current_user.is_anonymous else False
+    is_oauth_user = current_user.is_oauth if not current_user.is_anonymous else False
+
+    # Esegui il logout dell'utente
+    logout_user()
+
+    # Se l'utente è stato autenticato tramite Google, eliminalo dal database
+    if is_google_user:
+        User.delete().where(User.id == user_id).execute()
+
+    # Cancella eventuali dati di sessione di Google
+    if 'google_token' in session:
+        session.pop('google_token', None)
+
+    return redirect('/login')
+
+
+
 @app.route('/users')
 @login_required
 def users():
     all_users = User.select()
     return render_template('users.html', users=all_users)
 
-# Route per creare un nuovo utente
 @app.route('/users/new', methods=['GET', 'POST'])
 def new_user():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
-        # Verifica se l'utente esiste già
         existing_user = User.get_or_none(User.username == username)
         if existing_user:
             return 'Username already exists'
-
-        # Crea un nuovo utente e salvalo
         user = User(username=username)
         user.set_password(password)
         user.save()
-
         return redirect('/users')
-
     return render_template('new_user.html')
 
-# Inizializzazione del database e avvio dell'applicazione
 if __name__ == '__main__':
     db.connect()
     db.create_tables([User], safe=True)
-    app.run(debug=True)
+    threading.Thread(target=iss_tracker).start()
+    socketio.run(app, debug=True)
+    app.run(debug=True, port=5001)

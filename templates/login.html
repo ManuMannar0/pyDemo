@@ -2,23 +2,27 @@
 <html>
 <head>
     <title>Login</title>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <h2>Login</h2>
-    <form method="post">
-        Username: <input type="text" name="username"><br>
-        Password: <input type="password" name="password"><br>
-        <input type="submit" value="Login">
-    </form></br>
-
-    <h2>Google login</h2>
-    <form action="/login/google" method="post">
-        <input type="submit" value="Google login">
-    </form>
-
-    <h2>Create user</h2>
-    <form action="/users/new" method="post">
-        <input type="submit" value="Create user">
-    </form>
+    <div id="loginContainer">
+        <div id="loginContainer_sx">
+            <h2>LOGIN</h2>
+            <form method="post" class="loginContainer_form">
+                Username: <input type="text" name="username"><br>
+                Password: <input type="password" name="password"><br>
+                <input type="submit" value="Login">
+            </form></br>
+        </div>
+        <div id="loginContainer_dx">
+            <a href="/login/google" class="google-login">
+                <h2><i class="fab fa-google"></i> GOOGLE LOGIN</h2>
+            </a>
+            <a href="/users/new" class="create-user">
+                <h2><i class="fas fa-user-plus"></i> CREATE USER</h2>
+            </a>
+        </div>        
+    </div>
 </body>
 </html>

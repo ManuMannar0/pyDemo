@@ -1,0 +1,109 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #0a0a23; /* Sfondo scuro spaziale */
+    color: #fff; /* Testo chiaro */
+    line-height: 1.6;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 3rem;
+    h1, p {
+        margin: 0;
+        line-height: normal;
+    }
+    .user {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        text-transform: capitalize;
+    }
+}
+
+input[type="text"], input[type="password"] {
+    background-color: #fff;
+    color: #333;
+    padding: 10px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 5px;
+}
+
+input[type="submit"], button {
+    background-color: #0b3d91; 
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+ul {
+    list-style-type: none; 
+    padding: 0;
+}
+
+li {
+    background-color: #0a0a33; 
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+form {
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+#logoutBtn {
+    input {
+        background-color: transparent;
+        padding: 0;
+        text-decoration: underline;
+    }
+}
+#openstreetSearch {
+    width: fit-content;
+}
+#cityResults {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    form {
+        background-color: #0a0a44;
+        padding: 20px;
+    }
+}
+#loginContainer {
+    display: flex;
+    border: 1px solid;
+    border-radius: 10px;
+    text-align: center;
+    align-items: center;
+    justify-content: space-evenly;
+}
+#loginContainer_sx form:first-of-type, #newUserContainer {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid;
+    padding: 1rem;
+    align-items: center;
+}
+#newUserContainer {
+    form {
+        display: contents;
+    }
+}
+#loginContainer_dx {
+    a {
+        color: white;
+        text-decoration: none;
+    } 
+    h2:hover {
+        font-style: italic;
+    }
+}

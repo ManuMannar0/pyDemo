@@ -2,24 +2,18 @@
 <html>
 <head>
     <title>Lista Utenti</title>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
 </head>
 <body>
-    <h2>Utenti Registrati</h2>
+    <h2>Users</h2>
     <ul>
         {% for user in users %}
             {% if user.username %}
-                <li>utente registrato: {{ user.username }}</li>
+                <li>Site account: {{ user.username }}</li>
             {% else %}
-                <li>utente google: {{ user.email }}</li>
+                <li>Google user: {{ user.email }}</li>
             {% endif %}
         {% endfor %}
     </ul>
-
-
-
-
-    {% if current_user.is_authenticated %}
-    
-{% endif %}
 </body>
 </html>

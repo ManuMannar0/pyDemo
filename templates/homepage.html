@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Homepage</title>
+    <title>ISS position prediction</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <h1>Homepage</h1>
+    <header>
+        <h1>ISS position prediction</h1>
+        <div class="user">
+            {% if current_user.is_authenticated %}
+                {% if current_user.username %}
+                    <p>{{ current_user.username }} <i class="fa fa-user"></i></p>
+                {% else %}
+                    <p>{{ current_user.email }}</p>
+                {% endif %}
+            {% endif %}
+            <form action="/logout" method="post" id="logoutBtn">
+                <input type="submit" value="LOGOUT">
+            </form>
+        </div>
+    </header>
 
-    {% if current_user.is_authenticated %}
-        {% if current_user.username %}
-            <p>Bentornato, {{ current_user.username }}!</p>
-        {% else %}
-            <p>Utente loggato con Google email: {{ current_user.email }}</p>
-        {% endif %}
-    {% endif %}
-
-    <form action="/logout" method="post">
-        <input type="submit" value="logout">
-    </form>
-
-    <p>Inserisci il nome di una città</p>
-
-    <form action="/open_street_map" method="post">
-        <input type="text" name="city_name">
-        <button type="submit">Cerca</button>
+    <form action="/open_street_map" method="post" id="openstreetSearch">
+        <input type="text" name="city_name" placeholder="Insert location name">
+        <button type="submit">OK</button>
     </form>
 
     <div id="messages">
@@ -34,7 +37,7 @@
         {% endfor %}
     </div>
 
-    <div id="city_results">
+    <div id="cityResults">
         {% for city in cities %}
             <form action="/iss" method="post">
                 <input type="hidden" name="lat" value="{{ city.lat }}">
@@ -46,13 +49,18 @@
 
     <div id="map" style="height: 400px;"></div>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/@joergdietrich/leaflet.terminator"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
     <script>
-        var map = L.map('map').setView([0, 0], 3); // Imposta la vista iniziale della mappa
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 18,}).addTo(map); // Aggiungi un layer alla mappa
-        var issMarker = L.marker([0, 0]).addTo(map); // Crea un marker per la ISS
+        var map = L.map('map').setView([0, 0], 3); 
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 18}).addTo(map);
+        var issMarker = L.marker([0, 0]).addTo(map); 
+        var terminator = L.terminator().addTo(map);
+        
+        setInterval(function() {
+            terminator.setTime();
+        }, 1000 * 60);
 
         var socket = io.connect('http://' + document.domain + ':' + location.port);
         socket.on('update_position', function(data) {
@@ -60,7 +68,7 @@
         });
 
         function updateMap(latitude, longitude) {
-            L.circle([latitude,longitude], { radius: 200, color: 'red' }).addTo(map); 
+            L.circle([latitude, longitude], { radius: 200, color: 'red' }).addTo(map); 
             issMarker.setLatLng([latitude, longitude]); 
             map.setView([latitude, longitude], map.getZoom());
         }

@@ -4,7 +4,10 @@ import requests
 import threading
 import time
 import json
-from flask import Flask, request, redirect, render_template, session, url_for
+from flask import Flask, request, redirect, render_template, session, url_for, jsonify
+import pandas as pd
+import joblib
+from sklearn.ensemble import RandomForestRegressor
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required, UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from peewee import Model, CharField, SqliteDatabase, BooleanField
@@ -102,7 +105,7 @@ def iss():
     response = requests.get(f"https://api.n2yo.com/rest/v1/satellite/visualpasses/{satellite}/{lat}/{lon}/{alt}/{forNextDays}/{atLeastSec}/&apiKey={os.getenv('N2YO_KEY')}")
     data = response.json()
     def format_timestamp(unix_timestamp):
-        return datetime.fromtimestamp(unix_timestamp, timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+        return datetime.fromtimestamp(unix_timestamp, timezone.utc).strftime('%H:%M on %d-%m-%Y')
     descriptions = []
     for pass_info in data["passes"]:
         start_time = format_timestamp(pass_info["startUTC"])
@@ -110,8 +113,8 @@ def iss():
         max_time = format_timestamp(pass_info["maxUTC"])
         max_direction = pass_info["maxAzCompass"]
         description = (
-            f"Per osservare l'ISS, rivolgiti verso {start_direction} alle {start_time}. "
-            f"Il punto di massima elevazione sarà verso {max_direction} alle {max_time}."
+            f"To observe the ISS, look towards {start_direction} at {start_time}. "
+            f"The highest elevation point will be towards {max_direction}."
         )
         descriptions.append(description)
     return render_template('homepage.html', messages=descriptions)
@@ -129,11 +132,11 @@ def login():
             login_user(user)
             return redirect('/')
         else:
-            return 'Invalid username or password'
+            return redirect('/')
     return render_template('login.html')
 
 
-@app.route('/login/google', methods=['POST'])
+@app.route('/login/google')
 def logingoogle():
     redirect_uri = url_for('authorized', _external=True)
     return google.authorize_redirect(redirect_uri)
@@ -160,18 +163,11 @@ def logout():
     user_id = current_user.id if not current_user.is_anonymous else None
     is_google_user = current_user.is_oauth if not current_user.is_anonymous else False
     is_oauth_user = current_user.is_oauth if not current_user.is_anonymous else False
-
-    # Esegui il logout dell'utente
     logout_user()
-
-    # Se l'utente è stato autenticato tramite Google, eliminalo dal database
     if is_google_user:
         User.delete().where(User.id == user_id).execute()
-
-    # Cancella eventuali dati di sessione di Google
     if 'google_token' in session:
         session.pop('google_token', None)
-
     return redirect('/login')
 
 

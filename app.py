@@ -21,7 +21,7 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('ISS_PY_KEY')
-db = SqliteDatabase('isspy.db')
+db = SqliteDatabase('db/isspy.db')
 socketio = SocketIO(app)
 oauth = OAuth(app)
 login_manager = LoginManager(app)
@@ -177,6 +177,11 @@ def logout():
 def users():
     all_users = User.select()
     return render_template('users.html', users=all_users)
+
+@app.route('/documentation')
+@login_required
+def documentation():
+    return render_template('documentation.html')
 
 @app.route('/users/new', methods=['GET', 'POST'])
 def new_user():

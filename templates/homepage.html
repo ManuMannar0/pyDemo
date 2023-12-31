@@ -5,6 +5,9 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css') }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/@joergdietrich/leaflet.terminator"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
 </head>
 <body>
     <header>
@@ -17,9 +20,12 @@
                     <p>{{ current_user.email }}</p>
                 {% endif %}
             {% endif %}
-            <form action="/logout" method="post" id="logoutBtn">
-                <input type="submit" value="LOGOUT">
-            </form>
+            <div id="menu">
+                <a href="/" id="usersBtn">HOME - </a>
+                <a href="/users" id="usersBtn">USERS - </a>
+                <a href="/documentation" id="docuBtn">DOCUMENTATION - </a>
+                <a href="/logout" id="logoutBtn">LOGOUT</a>
+            </div>
         </div>
     </header>
 
@@ -47,30 +53,32 @@
         {% endfor %}
     </div></br>
 
-    <div id="map" style="height: 400px;"></div>
+    <div id="ISS">
+        <div id="map" style="height: 400px;"></div>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/P9C25Un7xaM?autoplay=1&controls=0&rel=0&showinfo=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
 
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/@joergdietrich/leaflet.terminator"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
     <script>
-        var map = L.map('map').setView([0, 0], 3); 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 18}).addTo(map);
-        var issMarker = L.marker([0, 0]).addTo(map); 
+        var map = L.map("map").setView([0, 0], 3);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 18,
+        }).addTo(map);
+        var issMarker = L.marker([0, 0]).addTo(map);
         var terminator = L.terminator().addTo(map);
-        
-        setInterval(function() {
-            terminator.setTime();
+
+        setInterval(function () {
+        terminator.setTime();
         }, 1000 * 60);
 
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
-        socket.on('update_position', function(data) {
-            updateMap(data.latitude, data.longitude);
+        var socket = io.connect("http://" + document.domain + ":" + location.port);
+        socket.on("update_position", function (data) {
+        updateMap(data.latitude, data.longitude);
         });
 
         function updateMap(latitude, longitude) {
-            L.circle([latitude, longitude], { radius: 200, color: 'red' }).addTo(map); 
-            issMarker.setLatLng([latitude, longitude]); 
-            map.setView([latitude, longitude], map.getZoom());
+        L.circle([latitude, longitude], { radius: 200, color: "red" }).addTo(map);
+        issMarker.setLatLng([latitude, longitude]);
+        map.setView([latitude, longitude], map.getZoom());
         }
     </script>
 </body>

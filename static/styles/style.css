@@ -1,7 +1,19 @@
+:root {
+    --background-dark: #0a0a23;
+    --text-light: #d6d6d6;
+    --text-dark: #333;
+    --button-bg: #0b3d91;
+    --list-bg: #0a0a33;
+    --form-bg: #0a0a44;
+    --link-color: var(--text-light);
+    --docu-color: #8681a1;
+    --docuTitle-color: #a18181;
+}
+
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #0a0a23; /* Sfondo scuro spaziale */
-    color: #fff; /* Testo chiaro */
+    background-color: var(--background-dark);
+    color: var(--text-light);
     line-height: 1.6;
     padding: 20px;
 }
@@ -10,21 +22,22 @@ header {
     display: flex;
     justify-content: space-between;
     padding-bottom: 3rem;
-    h1, p {
-        margin: 0;
-        line-height: normal;
-    }
-    .user {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        text-transform: capitalize;
-    }
+}
+
+header h1, header p {
+    margin: 0;
+    line-height: normal;
+}
+
+.user {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
 input[type="text"], input[type="password"] {
-    background-color: #fff;
-    color: #333;
+    background-color: var(--text-light);
+    color: var(--text-dark);
     padding: 10px;
     margin: 5px 0;
     border: none;
@@ -32,8 +45,8 @@ input[type="text"], input[type="password"] {
 }
 
 input[type="submit"], button {
-    background-color: #0b3d91; 
-    color: white;
+    background-color: var(--button-bg);
+    color: var(--text-light);
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
@@ -42,12 +55,12 @@ input[type="submit"], button {
 }
 
 ul {
-    list-style-type: none; 
+    list-style-type: none;
     padding: 0;
 }
 
 li {
-    background-color: #0a0a33; 
+    background-color: var(--list-bg);
     margin: 5px 0;
     padding: 10px;
     border-radius: 5px;
@@ -58,52 +71,74 @@ form {
     margin-bottom: 20px;
 }
 
-#logoutBtn {
-    input {
-        background-color: transparent;
+#menu {
+    a {
         padding: 0;
-        text-decoration: underline;
+        text-decoration: none;
+        color: white;
+        padding-top: 1rem;
+    }
+    a:hover {
+        font-style: italic;
     }
 }
+
 #openstreetSearch {
     width: fit-content;
 }
+
 #cityResults {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-
-    form {
-        background-color: #0a0a44;
-        padding: 20px;
-    }
 }
+
+#cityResults form {
+    padding: 20px;
+}
+
 #loginContainer {
     display: flex;
-    border: 1px solid;
     border-radius: 10px;
     text-align: center;
     align-items: center;
     justify-content: space-evenly;
 }
+
 #loginContainer_sx form:first-of-type, #newUserContainer {
     display: flex;
     flex-direction: column;
-    border: 1px solid;
     padding: 1rem;
     align-items: center;
 }
-#newUserContainer {
-    form {
-        display: contents;
-    }
+
+#newUserContainer form {
+    display: contents;
 }
-#loginContainer_dx {
-    a {
-        color: white;
-        text-decoration: none;
-    } 
-    h2:hover {
-        font-style: italic;
+
+#loginContainer_dx a {
+    color: var(--link-color);
+    text-decoration: none;
+} 
+
+#loginContainer_dx h2:hover {
+    font-style: italic;
+}
+
+#ISS {
+    display: flex;
+    flex-direction: column;
+}
+
+#ISS iframe {
+    width: 100%;
+}
+
+#documentation {
+    color: var(--docu-color);
+    .docuTitle {
+        text-transform: uppercase;
+        font-weight: bold;
+        color: var(--text-light);
     }
 }

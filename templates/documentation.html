@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask Web Application</title>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Flask Web Application</h1>
+        <div class="user">
+            {% if current_user.is_authenticated %}
+                {% if current_user.username %}
+                    <p>{{ current_user.username }} <i class="fa fa-user"></i></p>
+                {% else %}
+                    <p>{{ current_user.email }}</p>
+                {% endif %}
+            {% endif %}
+            <div id="menu">
+                <a href="/" id="usersBtn">HOME - </a>
+                <a href="/users" id="usersBtn">USERS - </a>
+                <a href="/documentation" id="docuBtn">DOCUMENTATION - </a>
+                <a href="/logout" id="logoutBtn">LOGOUT</a>
+            </div>
+        </div>
+    </header>
+
+    <div id="documentation">
+        <p>
+            The provided Python code represents a Flask web application that includes features like user authentication, Google OAuth login, and real-time tracking of the International Space Station (ISS) using its API. It also integrates with OpenStreetMap and N2YO for ISS tracking. The application uses SQLite for its database, and it runs a background thread to continuously track and update the ISS's position on a web page. The code is well-structured and includes templates for rendering HTML pages. It's a small project created in a short time with Python, demonstrating the integration of various technologies.
+        </p>
+        <br />
+        <p>
+            <strong class="docuTitle">User Authentication:</strong> The application allows users to register, log in, and log out. User passwords are securely hashed using the generate_password_hash function from Werkzeug.
+        </p>
+        <p>
+            <strong class="docuTitle">Google OAuth Login:</strong> Users can also log in using their Google accounts. The application uses the Authlib library to implement Google OAuth2 authentication.
+        </p>
+        <p>
+            <strong class="docuTitle">Database:</strong> It utilizes the SQLite database to store user information. It defines a User model with fields for username, password hash, email, and an OAuth flag.
+        </p>
+        <p>
+            <strong class="docuTitle">Real-Time ISS Tracking:</strong> The background thread iss_tracker continuously fetches the ISS's position from the "wheretheiss.at" API and emits it to clients using Socket.IO. The position is updated every 10 seconds.
+        </p>
+        <p>
+            <strong class="docuTitle">OpenStreetMap Integration:</strong> Users can search for cities, and the application queries OpenStreetMap for city data.
+        </p>
+        <p>
+            <strong class="docuTitle">N2YO Integration:</strong> Users can enter latitude and longitude coordinates, and the application queries the N2YO API for upcoming ISS passes. It then formats and displays pass information.
+        </p>
+        <p>
+            <strong class="docuTitle">Templates:</strong> The application includes HTML templates for rendering different pages, such as the homepage, user list, and documentation.
+        </p>
+        <p>
+            <strong class="docuTitle">CSS:</strong> Styling for the application is handled through CSS.
+        </p>
+        <p>
+            This project is a practical demonstration of web development with Flask, showcasing user management, third-party OAuth login, real-time updates, and API integration.
+        </p>        
+    </div>
+</body>
+</html>

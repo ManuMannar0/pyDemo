@@ -31,7 +31,7 @@ google = oauth.register(
     name='google',
     client_id=os.getenv('GOOGLE_CLIENT_ID'),
     client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    server_metadata_url='http://accounts.google.com/.well-known/openid-configuration',
     client_kwargs={'scope': 'openid email profile'}
 )
 
@@ -53,6 +53,7 @@ def load_user(user_id):
 
 def iss_tracker():
     while True:
+        socketio.emit('test_event', {'test_data': 'Questo è un messaggio di test'})
         position = get_iss_position()
         socketio.emit('update_position', {'latitude': position['latitude'], 'longitude': position['longitude']})
         print(position['latitude'], position['longitude'])
@@ -200,5 +201,5 @@ def new_user():
 if __name__ == '__main__':
     db.connect()
     db.create_tables([User], safe=True)
-    threading.Thread(target=iss_tracker).start()
-    socketio.run(app, debug=True)
+    threading.Thread(target=iss_tracker, daemon=True).start()
+    socketio.run(app, debug=True, port=5000)

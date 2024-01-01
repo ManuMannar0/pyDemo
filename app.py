@@ -22,7 +22,7 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('ISS_PY_KEY')
 db = SqliteDatabase('db/isspy.db')
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode='threading', logger=True, engineio_logger=True)
 oauth = OAuth(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -53,7 +53,6 @@ def load_user(user_id):
 
 def iss_tracker():
     while True:
-        socketio.emit('test_event', {'test_data': 'Questo è un messaggio di test'})
         position = get_iss_position()
         socketio.emit('update_position', {'latitude': position['latitude'], 'longitude': position['longitude']})
         print(position['latitude'], position['longitude'])
@@ -148,13 +147,6 @@ def authorized():
     token = google.token
     session['google_token'] = token 
     userinfo = google.get('https://www.googleapis.com/oauth2/v3/userinfo').json()
-
-    # Stampare le informazioni recuperate
-    print("Userinfo:", userinfo)
-    print("OpenID:", userinfo.get('sub'))
-    print("Email:", userinfo.get('email'))
-    print("Profile Name:", userinfo.get('name'))
-
     user = find_or_create_google_user(userinfo)
     login_user(user)
     return redirect(url_for('root'))
@@ -170,8 +162,6 @@ def logout():
     if 'google_token' in session:
         session.pop('google_token', None)
     return redirect('/login')
-
-
 
 @app.route('/users')
 @login_required
@@ -202,4 +192,5 @@ if __name__ == '__main__':
     db.connect()
     db.create_tables([User], safe=True)
     threading.Thread(target=iss_tracker, daemon=True).start()
-    socketio.run(app, debug=True, port=5000)
+    socketio.run(app, debug=True, port=5001)
+    #app.run(debug=True, port=8080)

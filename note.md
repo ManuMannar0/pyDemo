@@ -30,6 +30,7 @@ activate venv
 dependencies with requirements.txt
 python3 app.py OR app.run(debug=True, port=8080) if port used by another
 
+# nano little edits
 nano app.py
 ctrl+o and enter to save
 ctrl+x to exit

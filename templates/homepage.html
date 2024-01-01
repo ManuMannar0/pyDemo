@@ -55,9 +55,8 @@
 
     <div id="ISS">
         <div id="map" style="height: 400px;"></div>
-        <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/P9C25Un7xaM?autoplay=1&controls=0&rel=0&showinfo=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> -->
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/P9C25Un7xaM?autoplay=1&controls=0&rel=0&showinfo=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     </div>
-
     <script>
         var map = L.map("map").setView([0, 0], 3);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -65,26 +64,14 @@
         }).addTo(map);
         var issMarker = L.marker([0, 0]).addTo(map);
         var terminator = L.terminator().addTo(map);
-
         setInterval(function () {
-            terminator.setTime();
-        }, 1000 * 60);
-
+                terminator.setTime();
+            }, 1000 * 60);
+            
         var socket = io.connect("http://" + document.domain + ":" + location.port);
-        console.log(socket)
-        console.log("http://" + document.domain + ":" + location.port   );
-
         socket.on("update_position", function (data) {
-            console.log("UPDATE");
             updateMap(data.latitude, data.longitude);
         });
-        socket.on("test_event", function(data) {
-            console.log("Evento di Test ricevuto:", data);
-        });
-        socket.on('connect_error', (error) => { 
-            console.log('Errore di connessione:', error); 
-        });
-
         function updateMap(latitude, longitude) {
             L.circle([latitude, longitude], { radius: 200, color: "red" }).addTo(map);
             issMarker.setLatLng([latitude, longitude]);

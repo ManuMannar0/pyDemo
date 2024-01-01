@@ -202,4 +202,3 @@ if __name__ == '__main__':
     db.create_tables([User], safe=True)
     threading.Thread(target=iss_tracker).start()
     socketio.run(app, debug=True)
-    app.run(debug=True, port=5000)

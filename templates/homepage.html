@@ -68,7 +68,9 @@
                 terminator.setTime();
             }, 1000 * 60);
             
-        var socket = io.connect("http://" + document.domain + ":" + location.port);
+        //var socket = io.connect("http://" + document.domain + ":" + location.port);
+        var socket = io.connect('https://iispy-10c39b2f879c.herokuapp.com');
+
         socket.on("update_position", function (data) {
             updateMap(data.latitude, data.longitude);
         });

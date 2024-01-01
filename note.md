@@ -20,3 +20,17 @@ kill 18406
 db.connect()
 db.drop_tables([User])
 db.create_tables([User])
+
+### install
+pythonanywhere
+bash
+git clone
+create venv
+activate venv
+dependencies with requirements.txt
+python3 app.py OR app.run(debug=True, port=8080) if port used by another
+
+nano app.py
+ctrl+o and enter to save
+ctrl+x to exit
+

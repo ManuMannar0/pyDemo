@@ -6,8 +6,8 @@ import time
 import json
 from flask import Flask, request, redirect, render_template, session, url_for, jsonify
 import pandas as pd
-import joblib
-from sklearn.ensemble import RandomForestRegressor
+#import joblib
+#from sklearn.ensemble import RandomForestRegressor
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required, UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from peewee import Model, CharField, SqliteDatabase, BooleanField
@@ -202,4 +202,4 @@ if __name__ == '__main__':
     db.create_tables([User], safe=True)
     threading.Thread(target=iss_tracker).start()
     socketio.run(app, debug=True)
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5000)

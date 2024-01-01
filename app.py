@@ -52,18 +52,22 @@ def load_user(user_id):
     return User.get_or_none(User.id == int(user_id))
 
 def iss_tracker():
+    print('iss_tracker def')
     while True:
+        print('iss_tracker while')
         position = get_iss_position()
         socketio.emit('update_position', {'latitude': position['latitude'], 'longitude': position['longitude']})
         print(position['latitude'], position['longitude'])
         time.sleep(10)  
 
 def get_iss_position():
+    print('get_iss_position def')
     url = "https://api.wheretheiss.at/v1/satellites/25544"
     payload={}
     headers = {}
     response = requests.request("GET", url, headers=headers, data=payload)
     location = json.loads(response.text)
+    print('get_iss_position location: ', location)
     return(location)
 
 def find_or_create_google_user(userinfo):
@@ -192,5 +196,7 @@ if __name__ == '__main__':
     db.connect()
     db.create_tables([User], safe=True)
     threading.Thread(target=iss_tracker, daemon=True).start()
-    socketio.run(app, debug=True, port=5001)
+    socketio.run(app)
+    print('end py code')
+    #socketio.run(app, debug=True, port=5001)
     #app.run(debug=True, port=8080)

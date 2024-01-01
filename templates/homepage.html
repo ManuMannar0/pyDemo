@@ -65,16 +65,20 @@
         var issMarker = L.marker([0, 0]).addTo(map);
         var terminator = L.terminator().addTo(map);
         setInterval(function () {
+                console.log('darness or light update');
                 terminator.setTime();
             }, 1000 * 60);
             
         //var socket = io.connect("http://" + document.domain + ":" + location.port);
         var socket = io.connect('https://iispy-10c39b2f879c.herokuapp.com');
 
+        console.log('js socket on config');
         socket.on("update_position", function (data) {
+            console.log('update_position received');
             updateMap(data.latitude, data.longitude);
         });
         function updateMap(latitude, longitude) {
+            console.log('update map');
             L.circle([latitude, longitude], { radius: 200, color: "red" }).addTo(map);
             issMarker.setLatLng([latitude, longitude]);
             map.setView([latitude, longitude], map.getZoom());

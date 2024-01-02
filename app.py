@@ -193,14 +193,14 @@ def new_user():
         return redirect('/users')
     return render_template('new_user.html')
 
-#if __name__ == '__main__':
 gunicorn_logger = logging.getLogger('gunicorn.error')
 app.logger.handlers = gunicorn_logger.handlers
 app.logger.setLevel(gunicorn_logger.level)
 db.connect()
 db.create_tables([User], safe=True)
 threading.Thread(target=iss_tracker, daemon=True).start()
-socketio.run(app)
-app.logger.debug('end py code')
+
+if __name__ == '__main__':
+    socketio.run(app)
     #socketio.run(app, debug=True, port=5001)
     #app.run(debug=True, port=8080)

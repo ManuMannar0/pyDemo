@@ -56,30 +56,30 @@
     <div id="ISS">
         <div id="map" style="height: 400px;"></div>
         <iframe width="560" height="315" src="https://www.youtube.com/embed/P9C25Un7xaM?autoplay=1&controls=0&rel=0&showinfo=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-        <div id="youtubeClickMemo">Click YOUTUBE button to see and listen ISS webcam !</div>
+        <!-- <div id="youtubeClickMemo">Click YOUTUBE button to see and listen ISS webcam !</div> -->
     </div>
     <script>
-        const map = L.map("map");
-        map.on('load', addOverlayToMap);
-        map.setView([0, 0], 3);
+        var map = L.map("map").setView([0, 0], 3);
+        //map.on('load', addOverlayToMap);
+        //map.setView([0, 0], 3);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 18,
         }).addTo(map);
-        const issMarker = L.marker([0, 0]).addTo(map);
-        const terminator = L.terminator().addTo(map);
+        var issMarker = L.marker([0, 0]).addTo(map);
+        var terminator = L.terminator().addTo(map);
         setInterval(function () {
                 console.log('darness or light update');
                 terminator.setTime();
             }, 1000 * 60);
 
-        const socket = io.connect("http://" + document.domain + ":" + location.port);
-        //const socket = io.connect('https://iispy-10c39b2f879c.herokuapp.com');
+        //var socket = io.connect("http://" + document.domain + ":" + location.port);
+        var socket = io.connect('https://iispy-10c39b2f879c.herokuapp.com');
         socket.on("update_position", function (data) {
             console.log('update_position received');
             updateMap(data.latitude, data.longitude);
         });
 
-        localStorage.setItem("ISSnotYet", "");
+        //localStorage.setItem("ISSnotYet", "");
         
         //funcs
         function updateMap(latitude, longitude) {
@@ -87,32 +87,32 @@
             L.circle([latitude, longitude], { radius: 200, color: "red" }).addTo(map);
             issMarker.setLatLng([latitude, longitude]);
             map.setView([latitude, longitude], map.getZoom());
-            if (localStorage.getItem("ISSnotYet") !== null) {
-                removeISSoverlay();
-                localStorage.removeItem("ISSnotYet");                
-            }
+            // if (localStorage.getItem("ISSnotYet") !== null) {
+            //     removeISSoverlay();
+            //     localStorage.removeItem("ISSnotYet");                
+            // }
         }
-        function addOverlayToMap() {
-            const overlayDiv = document.createElement('div');
-            overlayDiv.id = 'overlayMap';
-            // const overlayText = document.createElement('div');
-            // overlayText.id = 'overlayMap_text';
-            // overlayText.innerHTML = 'ISS tracking.. wait please';
-            const overlaySpinnerContainer = document.createElement('div');
-            overlaySpinnerContainer.id = 'overlayMap_spinner_container';
-            const overlaySpinner = document.createElement('div');
-            overlaySpinner.id = 'overlayMap_spinner';
-            overlaySpinnerContainer.appendChild(overlaySpinner);
-            overlayDiv.appendChild(overlaySpinnerContainer);
-            // overlayDiv.appendChild(overlayText);
-            const mapPane = document.querySelector('#map .leaflet-map-pane');
-            mapPane.parentNode.insertBefore(overlayDiv, mapPane);
-        }
-        function removeISSoverlay() {
-            document.getElementById("overlayMap").remove();
-            document.querySelectorAll('.leaflet-top.leaflet-left')[0].style.display = 'block';
-            document.querySelectorAll('.leaflet-bottom.leaflet-right')[0].style.display = 'block';
-        }
+        // function addOverlayToMap() {
+        //     var overlayDiv = document.createElement('div');
+        //     overlayDiv.id = 'overlayMap';
+        //     // var overlayText = document.createElement('div');
+        //     // overlayText.id = 'overlayMap_text';
+        //     // overlayText.innerHTML = 'ISS tracking.. wait please';
+        //     var overlaySpinnerContainer = document.createElement('div');
+        //     overlaySpinnerContainer.id = 'overlayMap_spinner_container';
+        //     var overlaySpinner = document.createElement('div');
+        //     overlaySpinner.id = 'overlayMap_spinner';
+        //     overlaySpinnerContainer.appendChild(overlaySpinner);
+        //     overlayDiv.appendChild(overlaySpinnerContainer);
+        //     // overlayDiv.appendChild(overlayText);
+        //     var mapPane = document.querySelector('#map .leaflet-map-pane');
+        //     mapPane.parentNode.insertBefore(overlayDiv, mapPane);
+        // }
+        // function removeISSoverlay() {
+        //     document.getElementById("overlayMap").remove();
+        //     document.querySelectorAll('.leaflet-top.leaflet-left')[0].style.display = 'block';
+        //     document.querySelectorAll('.leaflet-bottom.leaflet-right')[0].style.display = 'block';
+        // }
     </script>
 </body>
 </html>

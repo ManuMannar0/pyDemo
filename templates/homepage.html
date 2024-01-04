@@ -56,7 +56,7 @@
     <div id="ISS">
         <div id="map" style="height: 400px;"></div>
         <iframe width="560" height="315" src="https://www.youtube.com/embed/P9C25Un7xaM?autoplay=1&controls=0&rel=0&showinfo=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-        <div id="youtubeClickMemo">Click YOUTUBE button to see and listen ISS webcam !</div>
+        <!-- <div id="youtubeClickMemo">Click YOUTUBE button to see and listen ISS webcam !</div> -->
     </div>
     <script>
         const map = L.map("map");
@@ -76,10 +76,10 @@
         const socket = io.connect('https://iispy-10c39b2f879c.herokuapp.com');
         socket.on("update_position", function (data) {
             console.log('update_position received');
-            updateMap(data.latitude, data.longitude);
+            //updateMap(data.latitude, data.longitude);
         });
 
-        localStorage.setItem("ISSnotYet", "");
+        //localStorage.setItem("ISSnotYet", "");
         
         //funcs
         function updateMap(latitude, longitude) {

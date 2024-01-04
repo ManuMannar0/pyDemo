@@ -72,8 +72,8 @@
                 terminator.setTime();
             }, 1000 * 60);
 
-        const socket = io.connect("http://" + document.domain + ":" + location.port);
-        //const socket = io.connect('https://iispy-10c39b2f879c.herokuapp.com');
+        //const socket = io.connect("http://" + document.domain + ":" + location.port);
+        const socket = io.connect('https://iispy-10c39b2f879c.herokuapp.com');
         socket.on("update_position", function (data) {
             console.log('update_position received');
             updateMap(data.latitude, data.longitude);

@@ -59,9 +59,9 @@
         <!-- <div id="youtubeClickMemo">Click YOUTUBE button to see and listen ISS webcam !</div> -->
     </div>
     <script>
-        var map = L.map("map").setView([0, 0], 3);
+        var map = L.map("map");
         map.on('load', addOverlayToMap);
-        //map.setView([0, 0], 3);
+        map.setView([0, 0], 3);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 18,
         }).addTo(map);

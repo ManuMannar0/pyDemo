@@ -73,16 +73,14 @@ form {
     margin-bottom: 20px;
 }
 
-#menu {
-    a {
-        padding: 0;
-        text-decoration: none;
-        color: white;
-        padding-top: 1rem;
-    }
-    a:hover {
-        font-style: italic;
-    }
+a {
+    padding: 0;
+    text-decoration: none;
+    color: white;
+    padding-top: 1rem;
+}
+a:hover {
+    font-style: italic;
 }
 
 #openstreetSearch {

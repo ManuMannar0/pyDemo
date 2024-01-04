@@ -16,6 +16,7 @@ from flask_socketio import SocketIO
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
 import os
+import logging
 
 load_dotenv()
 
@@ -31,7 +32,7 @@ google = oauth.register(
     name='google',
     client_id=os.getenv('GOOGLE_CLIENT_ID'),
     client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    server_metadata_url='http://accounts.google.com/.well-known/openid-configuration',
     client_kwargs={'scope': 'openid email profile'}
 )
 
@@ -52,22 +53,22 @@ def load_user(user_id):
     return User.get_or_none(User.id == int(user_id))
 
 def iss_tracker():
-    print('iss_tracker def')
+    app.logger.debug('iss_tracker def')
     while True:
-        print('iss_tracker while')
+        app.logger.debug('iss_tracker while')
         position = get_iss_position()
         socketio.emit('update_position', {'latitude': position['latitude'], 'longitude': position['longitude']})
-        print(position['latitude'], position['longitude'])
+        app.logger.debug(position['latitude'], position['longitude'])
         time.sleep(10)  
 
 def get_iss_position():
-    print('get_iss_position def')
+    app.logger.debug('get_iss_position def')
     url = "https://api.wheretheiss.at/v1/satellites/25544"
     payload={}
     headers = {}
     response = requests.request("GET", url, headers=headers, data=payload)
     location = json.loads(response.text)
-    print('get_iss_position location: ', location)
+    app.logger.debug('get_iss_position location: ', location)
     return(location)
 
 def find_or_create_google_user(userinfo):

@@ -8,6 +8,8 @@
     --link-color: var(--text-light);
     --docu-color: #8681a1;
     --docuTitle-color: #a18181;
+    --nasaRed-color: #fa2200;
+    --loader-size: 120px;
 }
 
 body {
@@ -142,3 +144,64 @@ form {
         color: var(--text-light);
     }
 }
+
+#youtubeClickMemo {
+    font-size: 2rem;
+    text-align: center;
+    color: var(--nasaRed-color);
+}
+#youtubeClickMemo {
+    animation: fadeOut 3s ease-out 8s forwards;
+}
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* map */
+.leaflet-top.leaflet-left {
+    display: none;
+}
+.leaflet-bottom.leaflet-right {
+    display: none;
+}
+#overlayMap {
+    z-index: 500;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: var(--background-dark);
+}
+/* #overlayMap_text {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    font-size: 2rem;
+} */
+#overlayMap_spinner {
+    border: 16px solid var(--nasaRed-color);
+    border-top: 16px solid var(--text-light); 
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 1s linear infinite;
+    transform: translate(calc(50% - var(--loader-size)), calc(50% - var(--loader-size)));
+    width: var(--loader-size);
+    height: var(--loader-size);
+}
+#overlayMap_spinner_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+  

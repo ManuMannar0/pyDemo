@@ -76,7 +76,7 @@
         var socket = io.connect('https://iispy-10c39b2f879c.herokuapp.com');
         socket.on("update_position", function (data) {
             console.log('update_position received');
-            //updateMap(data.latitude, data.longitude);
+            updateMap(data.latitude, data.longitude);
         });
 
         //localStorage.setItem("ISSnotYet", "");
